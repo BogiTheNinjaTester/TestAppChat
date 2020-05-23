@@ -20,10 +20,6 @@ def index():
         username = registration_form.username.data
         password = registration_form.password.data
 
-        # check if username exists
-        user_object = User.query.filter_by(username=username).all()
-        if user_object:
-            return 'Someone else took this name!'
 
         user = User(username=username, password=password)
         db.session.add(user)
