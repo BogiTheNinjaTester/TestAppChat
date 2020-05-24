@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, url_for
 from wtform_fields import *
 from models import *
+from passlib.hash import pbkdf2_sha256
 
 app = Flask(__name__)
 app.secret_key = 'replace later'
@@ -20,8 +21,9 @@ def index():
         username = registration_form.username.data
         password = registration_form.password.data
 
+        hashed_password = pbkdf2_sha256.hash(password)
 
-        user = User(username=username, password=password)
+        user = User(username=username, password=hashed_password)
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('login'))
