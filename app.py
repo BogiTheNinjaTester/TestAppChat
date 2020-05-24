@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for
 from wtform_fields import *
 from models import *
 
@@ -24,10 +24,18 @@ def index():
         user = User(username=username, password=password)
         db.session.add(user)
         db.session.commit()
-        return 'User has been inserted into DB!'
-
+        return redirect(url_for('login'))
 
     return render_template('index.html', form=registration_form)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    ''' TBD '''
+
+    login_form = LoginForm()
+    if login_form.validate_on_submit():
+        return 'Logged in!'
+    return render_template('login.html', form=login_form)
 
 if __name__ == "__main__":
 
