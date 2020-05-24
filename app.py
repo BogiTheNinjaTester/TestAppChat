@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, flash
 from wtform_fields import *
 from models import *
 from passlib.hash import pbkdf2_sha256
@@ -33,6 +33,8 @@ def index():
         user = User(username=username, password=hashed_password)
         db.session.add(user)
         db.session.commit()
+
+        flash('Registered successfully. Please login.', 'success')
         return redirect(url_for('login'))
 
     return render_template('index.html', form=registration_form)
@@ -53,7 +55,8 @@ def login():
 def chat():
 
     if not current_user.is_authenticated:
-        return 'Please login before accessing chat'
+        flash('Please login.', 'danger')
+        return redirect(url_for('login'))
 
     return 'Chat with me!!'
 
@@ -61,7 +64,9 @@ def chat():
 def logout():
 
     logout_user()
-    return 'Logged out using flask-login!'
+    flash('You have logged out successfully', 'success')
+    return redirect(url_for('login'))
+
 
 if __name__ == "__main__":
 
