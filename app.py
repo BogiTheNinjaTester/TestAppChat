@@ -7,7 +7,7 @@ from flask_socketio import SocketIO, send, join_room, leave_room, emit
 from time import localtime, strftime
 
 app = Flask(__name__)
-app.secret_key = 'replace later'
+app.secret_key = 'secret key'
 
 # DB configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@localhost/ChatApplication'
