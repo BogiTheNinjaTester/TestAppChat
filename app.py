@@ -2,7 +2,9 @@ from flask import Flask, render_template, redirect, url_for, flash
 from wtform_fields import *
 from models import *
 from passlib.hash import pbkdf2_sha256
-from flask_login import LoginManager, login_user, current_user, login_required, logout_user
+from flask_login import LoginManager, login_user, current_user, logout_user
+from flask_socketio import SocketIO, send, join_room, leave_room, emit
+from time import localtime, strftime
 
 app = Flask(__name__)
 app.secret_key = 'replace later'
@@ -14,6 +16,9 @@ db = SQLAlchemy(app)
 
 login = LoginManager(app)
 login.init_app(app)
+
+socketio = SocketIO(app)
+ROOMS = ['Selenium', 'Appium', 'Locust', 'Gatling']
 
 @login.user_loader
 def load_user(id):
@@ -58,7 +63,7 @@ def chat():
         flash('Please login.', 'danger')
         return redirect(url_for('login'))
 
-    return 'Chat with me!!'
+    return render_template('chat.html', username=current_user.username, rooms=ROOMS)
 
 @app.route('/logout', methods=['GET'])
 def logout():
@@ -67,7 +72,27 @@ def logout():
     flash('You have logged out successfully', 'success')
     return redirect(url_for('login'))
 
+@socketio.on('message')
+def message(data):
+    print(data)
+
+    send({'msg': data['msg'], 'username': data['username'], 'timestamp':strftime('%b-%d %I:%M%p', localtime())}, room=data['room'])
+
+@socketio.on('join')
+def join(data):
+    room = data['room']
+    join_room(room)
+    send({'msg':data['username'] + ' has joined the ' +room + 'room'}, room=room)
+
+@socketio.on('leave')
+def leave(data):
+    leave_room(data['room'])
+    send({'msg': data['username'] + 'has left the ' + data['room'] + 'room'}, room=data['room'])
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 if __name__ == "__main__":
 
-    app.run(debug=True)
+   socketio.run(app, debug=True)

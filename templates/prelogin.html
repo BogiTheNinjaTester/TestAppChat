@@ -3,8 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %} - Chat Application</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
 </head>
 <body>
+<div class="main-section">
+
+            <div class="jumbotron text-center">
+              <h1 class="display-4">ChatApplication</h1>
+              <p class="lead">Test this app!</p>
+            </div>
+
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
 
@@ -16,5 +24,6 @@
 
     {% block content%}
     {% endblock %}
+</div>
 </body>
 </html>
