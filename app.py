@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.secret_key = 'secret key'
 
 # DB configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@localhost/ChatApplication'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@db/postgres'
 
 db = SQLAlchemy(app)
 
@@ -26,7 +26,7 @@ def load_user(id):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    ''' TBD '''
+    ''' Index. '''
 
     registration_form = RegistrationForm()
     if registration_form.validate_on_submit():
@@ -46,7 +46,7 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    ''' TBD '''
+    ''' Login. '''
 
     login_form = LoginForm()
     if login_form.validate_on_submit():
@@ -58,6 +58,7 @@ def login():
 
 @app.route('/chat', methods=['GET', 'POST'])
 def chat():
+    ''' Chat.'''
 
     if not current_user.is_authenticated:
         flash('Please login.', 'danger')
@@ -67,6 +68,7 @@ def chat():
 
 @app.route('/logout', methods=['GET'])
 def logout():
+    ''' Logout.'''
 
     logout_user()
     flash('You have logged out successfully', 'success')
@@ -74,25 +76,28 @@ def logout():
 
 @socketio.on('message')
 def message(data):
-    print(data)
+    ''' Send message through socket. '''
 
     send({'msg': data['msg'], 'username': data['username'], 'timestamp':strftime('%b-%d %I:%M%p', localtime())}, room=data['room'])
 
 @socketio.on('join')
 def join(data):
+    ''' Join the room. '''
     room = data['room']
     join_room(room)
     send({'msg':data['username'] + ' has joined the ' +room + 'room'}, room=room)
 
 @socketio.on('leave')
 def leave(data):
+    ''' Leave the room. '''
     leave_room(data['room'])
     send({'msg': data['username'] + 'has left the ' + data['room'] + 'room'}, room=data['room'])
 
 @app.errorhandler(404)
 def page_not_found(e):
+    ''' Error 404. '''
+
     return render_template('404.html'), 404
 
 if __name__ == "__main__":
-
    socketio.run(app, debug=True)

@@ -1,17 +1,24 @@
 version: '3'
 services:
-  web:
+  chatapplication:
     build: .
     ports:
       - "5000:5000"
-  db:
-    image: postgres:12-alpine
+    depends_on:
+      - db
+    links:
+      - db
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - '/docker-compose-v2'
+  db:
+    image: postgres
+    build: ./DB
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=admin
-      - POSTGRES_DB=ChatApplication
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+    restart: always
 
-volumes:
-  postgres_data:
+
